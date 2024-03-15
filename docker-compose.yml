@@ -3,9 +3,23 @@ version: "3.9"
 services:
 
 
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    volumes:
+      - ~/data/minio:/data
+    environment:
+      - MINIO_ROOT_USER=root
+      - MINIO_ROOT_PASSWORD=rootpassword
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
   db:
     image: postgres:15
     container_name: db
+    volumes:
+      - ~/data/postgres:/var/lib/postgresql/data/
     environment:
       POSTGRES_DB: cloud-storage
       POSTGRES_USER: kirill
