@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+
+
+  db:
+    image: postgres:15
+    container_name: db
+    environment:
+      POSTGRES_DB: cloud-storage
+      POSTGRES_USER: kirill
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - 5432
