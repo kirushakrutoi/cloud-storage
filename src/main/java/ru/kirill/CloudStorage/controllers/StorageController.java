@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import ru.kirill.CloudStorage.security.UserDetailsImpl;
 import ru.kirill.CloudStorage.services.MinioService;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/")
@@ -25,7 +27,13 @@ public class StorageController {
 
 
     @GetMapping
-    public String mainPage(){
+    public String mainPage(Model model){
+        User user = getUser();
+
+        List<String> names = minioService.loadAll(user);
+
+        model.addAttribute("names", names);
+
         return "main";
     }
 

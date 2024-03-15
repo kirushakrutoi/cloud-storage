@@ -13,10 +13,13 @@
     <div class="submit">
         <button type="submit" class="btn btn-outline-light">  Submit  </button>
     </div>
-
-
-
 </form>
+
+<br/>
+
+<div th:each="name : ${names}" th:if="${names ne null}">
+    <p th:text="${name}"></p>
+</div>
 
 
 </body>
