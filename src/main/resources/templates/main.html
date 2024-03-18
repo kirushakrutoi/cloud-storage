@@ -11,15 +11,22 @@
         <input type="file" id="file" name="file"/>
     </div>
     <div class="submit">
-        <button type="submit" class="btn btn-outline-light">  Submit  </button>
+        <button type="submit" class="btn btn-outline-light" name="path" th:value="${path}">  Submit  </button>
     </div>
 </form>
 
 <br/>
 
 <div th:each="name : ${names}" th:if="${names ne null}">
-    <p th:text="${name}"></p>
+    <a th:if="${!name.contains('.')}" th:text="${name}" th:href="@{?path={path}{dirname}%2F(dirname=${name}, path=${path})}"></a>
+    <p th:if="${name.contains('.')}" th:text="${name}"></p>
 </div>
+
+<form th:method="POST" th:action="@{/newdir}">
+    <label for="dirname" class="form-label">Create new folder</label>
+    <input type="text" class="form-control" id="dirname" name="dirname">
+    <button type="submit" class="btn btn-outline-light" name="path" th:value="${path}">  Create  </button>
+</form>
 
 
 </body>
