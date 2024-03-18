@@ -48,7 +48,7 @@ public class StorageController {
     @PostMapping
     public String loadFile(@RequestParam("file") MultipartFile file,
                            @RequestParam("path") String path,
-                           RedirectAttributes redirectAttributes, HttpServletRequest req) throws FileNotFoundException {
+                           RedirectAttributes redirectAttributes) throws FileNotFoundException {
         User user = getUser();
 
         if(path != null)
@@ -63,7 +63,7 @@ public class StorageController {
     @PostMapping("/newdir")
     public String loadNewDir(@RequestParam("dirname") String dirName,
                              @RequestParam("path") String path,
-                             RedirectAttributes redirectAttributes, HttpServletRequest req){
+                             RedirectAttributes redirectAttributes){
         User user = getUser();
 
         if(path != null)
@@ -72,6 +72,24 @@ public class StorageController {
             minioService.storeDir(dirName, user, "");
 
         redirectAttributes.addAttribute("path", path);
+        return "redirect:/";
+    }
+
+    @PostMapping("/delete")
+    public String deleteFile(@RequestParam("path") String path,
+                             @RequestParam("filename") String filename,
+                             RedirectAttributes redirectAttributes){
+
+        User user = getUser();
+
+        if(path != null) {
+            minioService.delete(filename, user, path.replaceAll("%2F", "/"));
+            redirectAttributes.addAttribute("path", path);
+        }
+        else
+            minioService.delete(filename, user, "");
+
+
         return "redirect:/";
     }
 

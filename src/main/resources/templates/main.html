@@ -20,6 +20,9 @@
 <div th:each="name : ${names}" th:if="${names ne null}">
     <a th:if="${!name.contains('.')}" th:text="${name}" th:href="@{?path={path}{dirname}%2F(dirname=${name}, path=${path})}"></a>
     <p th:if="${name.contains('.')}" th:text="${name}"></p>
+    <form th:method="POST" th:action="@{/delete?filename={filename}&path={path}(filename=${name}, path=${path})}">
+        <button type="submit" class="btn btn-outline-light" >  delete  </button>
+    </form>
 </div>
 
 <form th:method="POST" th:action="@{/newdir}">

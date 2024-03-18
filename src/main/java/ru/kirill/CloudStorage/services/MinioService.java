@@ -1,9 +1,6 @@
 package ru.kirill.CloudStorage.services;
 
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.Result;
+import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import lombok.AllArgsConstructor;
@@ -72,6 +69,20 @@ public class MinioService {
                             .stream(new ByteArrayInputStream(new byte[] {}), 0, -1)
                             .build());
 
+        } catch (ServerException | InternalException | XmlParserException | InvalidResponseException |
+                 InvalidKeyException | NoSuchAlgorithmException | IOException | ErrorResponseException |
+                 InsufficientDataException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void delete(String filename, User user, String path){
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket("user-files")
+                            .object("user-" + user.getId() + "-files/" + path  + filename)
+                            .build());
         } catch (ServerException | InternalException | XmlParserException | InvalidResponseException |
                  InvalidKeyException | NoSuchAlgorithmException | IOException | ErrorResponseException |
                  InsufficientDataException e) {
