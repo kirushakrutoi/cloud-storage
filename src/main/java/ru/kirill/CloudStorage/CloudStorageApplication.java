@@ -12,28 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SpringBootApplication
 public class CloudStorageApplication {
 
-	@Value("${MINIO_ROOT_USER}")
-	private String minioUser;
-
-	@Value("${MINIO_ROOT_PASSWORD}")
-	private String minioPassword;
-
-
 	public static void main(String[] args) {
 		SpringApplication.run(CloudStorageApplication.class, args);
-	}
-
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public MinioClient minioClient() {
-        return MinioClient.builder()
-                .endpoint("http://127.0.0.1:9000")
-                .credentials(minioUser, minioPassword)
-                .build();
 	}
 
 }

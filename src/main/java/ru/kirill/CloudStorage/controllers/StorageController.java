@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.kirill.CloudStorage.models.User;
 import ru.kirill.CloudStorage.security.UserDetailsImpl;
 import ru.kirill.CloudStorage.services.MinioService;
+import ru.kirill.CloudStorage.services.interfaces.StorageService;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import java.util.List;
 @AllArgsConstructor
 public class StorageController {
 
-    private final MinioService minioService;
+    private final StorageService storageService;
 
 
     @GetMapping
@@ -35,9 +36,9 @@ public class StorageController {
         List<String> names = new ArrayList<>();
 
         if(path != null)
-            names = minioService.loadAll(user, path.replaceAll("%2F", "/"));
+            names = storageService.loadAll(user, path.replaceAll("%2F", "/"));
         else
-            names = minioService.loadAll(user, "");
+            names = storageService.loadAll(user, "");
 
         model.addAttribute("names", names);
         model.addAttribute("path", path);
@@ -57,9 +58,9 @@ public class StorageController {
 
 
         if(path != null)
-            minioService.store(file, user, path.replaceAll("%2F", "/"));
+            storageService.store(file, user, path.replaceAll("%2F", "/"));
         else
-            minioService.store(file, user, "");
+            storageService.store(file, user, "");
 
         redirectAttributes.addAttribute("path", path);
         return "redirect:/";
@@ -77,9 +78,9 @@ public class StorageController {
 
 
         if(path != null)
-            minioService.uploadFolder(files, user, path.replaceAll("%2F", "/"));
+            storageService.uploadFolder(files, user, path.replaceAll("%2F", "/"));
         else
-            minioService.uploadFolder(files, user, "");
+            storageService.uploadFolder(files, user, "");
 
         redirectAttributes.addAttribute("path", path);
         return "redirect:/";
@@ -92,9 +93,9 @@ public class StorageController {
         User user = getUser();
 
         if(path != null)
-            minioService.storeDir(dirName, user, path.replaceAll("%2F", "/"));
+            storageService.storeDir(dirName, user, path.replaceAll("%2F", "/"));
         else
-            minioService.storeDir(dirName, user, "");
+            storageService.storeDir(dirName, user, "");
 
         redirectAttributes.addAttribute("path", path);
         return "redirect:/";
@@ -108,11 +109,11 @@ public class StorageController {
         User user = getUser();
 
         if(path != null) {
-            minioService.delete(filename, user, path.replaceAll("%2F", "/"));
+            storageService.delete(filename, user, path.replaceAll("%2F", "/"));
             redirectAttributes.addAttribute("path", path);
         }
         else
-            minioService.delete(filename, user, "");
+            storageService.delete(filename, user, "");
 
 
         return "redirect:/";
