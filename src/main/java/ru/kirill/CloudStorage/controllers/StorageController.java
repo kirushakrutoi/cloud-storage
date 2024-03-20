@@ -45,16 +45,41 @@ public class StorageController {
         return "main";
     }
 
-    @PostMapping
+    @PostMapping("/upload/file")
     public String loadFile(@RequestParam("file") MultipartFile file,
                            @RequestParam("path") String path,
                            RedirectAttributes redirectAttributes) throws FileNotFoundException {
         User user = getUser();
 
+        System.out.println(file.getName());
+        System.out.println(file.getOriginalFilename());
+        System.out.println(file.getContentType());
+
+
         if(path != null)
             minioService.store(file, user, path.replaceAll("%2F", "/"));
         else
             minioService.store(file, user, "");
+
+        redirectAttributes.addAttribute("path", path);
+        return "redirect:/";
+    }
+
+    @PostMapping("/upload/folder")
+    public String loadFolder(@RequestParam("file") List<MultipartFile> files,
+                           @RequestParam("path") String path,
+                           RedirectAttributes redirectAttributes) throws FileNotFoundException {
+        User user = getUser();
+
+        for(MultipartFile file : files){
+            System.out.println(file.getOriginalFilename());
+        }
+
+
+        if(path != null)
+            minioService.uploadFolder(files, user, path.replaceAll("%2F", "/"));
+        else
+            minioService.uploadFolder(files, user, "");
 
         redirectAttributes.addAttribute("path", path);
         return "redirect:/";
