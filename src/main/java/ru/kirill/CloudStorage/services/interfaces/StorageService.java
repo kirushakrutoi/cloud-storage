@@ -4,6 +4,7 @@ package ru.kirill.CloudStorage.services.interfaces;
 import org.springframework.web.multipart.MultipartFile;
 import ru.kirill.CloudStorage.models.User;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface StorageService {
@@ -12,5 +13,6 @@ public interface StorageService {
     public void uploadFolder(List<MultipartFile> files, User user, String path);
     public void storeDir(String dirName, User user, String path);
     public void delete(String filename, User user, String path);
+    public byte[] download(String filename, User user, String path) throws IOException;
 
 }

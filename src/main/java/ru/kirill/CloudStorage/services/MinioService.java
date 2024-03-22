@@ -9,6 +9,7 @@ import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.AllArgsConstructor;
 import okio.Path;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.kirill.CloudStorage.models.User;
@@ -47,5 +48,10 @@ public class MinioService implements StorageService {
 
     public void delete(String filename, User user, String path){
         minioRepository.delete(filename, user, path);
+    }
+
+    @Override
+    public byte[] download(String filename, User user, String path) throws IOException {
+        return IOUtils.toByteArray(minioRepository.download(filename, user, path));
     }
 }

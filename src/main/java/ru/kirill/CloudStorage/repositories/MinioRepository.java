@@ -12,6 +12,7 @@ import ru.kirill.CloudStorage.models.User;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class MinioRepository {
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket("user-files")
-                            .object("user-" + user.getId() + "-files/" + path + dirName + '/')
+                            .object("user-" + user.getId() + "-files/" + path + dirName + "/")
                             .stream(new ByteArrayInputStream(new byte[] {}), 0, -1)
                             .build());
 
@@ -132,5 +133,20 @@ public class MinioRepository {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public InputStream download(String filename, User user, String path){
+        try  {
+            return minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket("user-files")
+                            .object("user-" + user.getId() + "-files/" + path + filename)
+                            .build());
+
+        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+                 InternalException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

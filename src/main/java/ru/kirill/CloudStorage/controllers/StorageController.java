@@ -2,6 +2,8 @@ package ru.kirill.CloudStorage.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,10 +19,13 @@ import ru.kirill.CloudStorage.models.User;
 import ru.kirill.CloudStorage.security.UserDetailsImpl;
 import ru.kirill.CloudStorage.services.MinioService;
 import ru.kirill.CloudStorage.services.interfaces.StorageService;
+import ru.kirill.CloudStorage.utils.PathUtil;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/")
@@ -33,15 +38,14 @@ public class StorageController {
     @GetMapping
     public String mainPage(@RequestParam(value = "path", required = false) String path, Model model){
         User user = getUser();
-        List<String> names = new ArrayList<>();
+        List<String> names;
 
-        if(path != null)
-            names = storageService.loadAll(user, path.replaceAll("%2F", "/"));
-        else
-            names = storageService.loadAll(user, "");
+        names = storageService.loadAll(user, Objects.requireNonNullElse(path, ""));
 
         model.addAttribute("names", names);
         model.addAttribute("path", path);
+        if(path != null)
+            model.addAttribute("nav", PathUtil.createMap(path));
 
         return "main";
     }
@@ -50,17 +54,10 @@ public class StorageController {
     public String loadFile(@RequestParam("file") MultipartFile file,
                            @RequestParam("path") String path,
                            RedirectAttributes redirectAttributes) throws FileNotFoundException {
+
         User user = getUser();
 
-        System.out.println(file.getName());
-        System.out.println(file.getOriginalFilename());
-        System.out.println(file.getContentType());
-
-
-        if(path != null)
-            storageService.store(file, user, path.replaceAll("%2F", "/"));
-        else
-            storageService.store(file, user, "");
+        storageService.store(file, user, Objects.requireNonNullElse(path, ""));
 
         redirectAttributes.addAttribute("path", path);
         return "redirect:/";
@@ -77,10 +74,7 @@ public class StorageController {
         }
 
 
-        if(path != null)
-            storageService.uploadFolder(files, user, path.replaceAll("%2F", "/"));
-        else
-            storageService.uploadFolder(files, user, "");
+        storageService.uploadFolder(files, user, Objects.requireNonNullElse(path, ""));
 
         redirectAttributes.addAttribute("path", path);
         return "redirect:/";
@@ -92,10 +86,7 @@ public class StorageController {
                              RedirectAttributes redirectAttributes){
         User user = getUser();
 
-        if(path != null)
-            storageService.storeDir(dirName, user, path.replaceAll("%2F", "/"));
-        else
-            storageService.storeDir(dirName, user, "");
+        storageService.storeDir(dirName, user, Objects.requireNonNullElse(path, ""));
 
         redirectAttributes.addAttribute("path", path);
         return "redirect:/";
@@ -109,7 +100,7 @@ public class StorageController {
         User user = getUser();
 
         if(path != null) {
-            storageService.delete(filename, user, path.replaceAll("%2F", "/"));
+            storageService.delete(filename, user, path);
             redirectAttributes.addAttribute("path", path);
         }
         else
@@ -117,6 +108,23 @@ public class StorageController {
 
 
         return "redirect:/";
+    }
+
+    @GetMapping("/file/download")
+    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam("path") String path,
+                                                          @RequestParam("filename") String filename) throws IOException {
+
+        User user = getUser();
+
+        byte[] data = storageService.download(filename, user, Objects.requireNonNullElse(path, ""));
+        ByteArrayResource resource = new ByteArrayResource(data);
+
+        return ResponseEntity
+                .ok()
+                .contentLength(data.length)
+                .header("Content-type", "application/octet-stream")
+                .header("Content-disposition", "attachment; filename=\"" + filename + "\"")
+                .body(resource);
     }
 
     private User getUser(){

@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 </head>
 <body>
+
+<a th:href="@{/}" class="conteiner">home/</a>
+<div th:each="entry, stat : ${nav}" class="conteiner">
+    <a  th:unless="${stat.last}" th:href="@{/?path={path}(path=${entry.key})}" th:text="${entry.value} + '/'"></a>
+    <span th:if="${stat.last}" th:text="${entry.value}"></span>
+</div>
+
+<br/>
+
+
 <form enctype="multipart/form-data" th:method="POST" th:action="@{/upload/file}">
     <div>
         <label for="file">Upload file:</label>
@@ -14,6 +25,8 @@
         <button type="submit" class="btn btn-outline-light" name="path" th:value="${path}">  Submit  </button>
     </div>
 </form>
+
+
 
 <form enctype="multipart/form-data" th:method="POST" th:action="@{/upload/folder}">
     <div>
@@ -30,7 +43,13 @@
 <div th:each="name : ${names}" th:if="${names ne null}">
     <a th:if="${!name.contains('.')}" th:text="${name}" th:href="@{?path={path}{dirname}%2F(dirname=${name}, path=${path})}"></a>
     <p th:if="${name.contains('.')}" th:text="${name}"></p>
-    <form th:method="POST" th:action="@{/delete?filename={filename}&path={path}(filename=${name}, path=${path})}">
+    <form th:method="POST" th:action="@{/delete?filename={filename}&path={path}(filename=${name}, path=${path})}" class="conteiner">
+        <button type="submit" class="btn btn-outline-light" >  delete  </button>
+    </form>
+
+    <form th:method="GET" th:action="@{/file/download}" class="conteiner">
+        <input type="hidden" name="filename" th:value="${name}" />
+        <input type="hidden" name="path" th:value="${path}" />
         <button type="submit" class="btn btn-outline-light" >  delete  </button>
     </form>
 </div>
